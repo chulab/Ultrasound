@@ -67,3 +67,4 @@ def calculate_pad_size(
                     + tf.cast(array_shape, tf.float32) /  2
 
   return padding, corner_position, center_position
+
