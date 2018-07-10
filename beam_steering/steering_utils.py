@@ -30,6 +30,7 @@ def calculate_angle(
             moved.
         final_x: integer corresponding to desired final horizontal (Y)
             position of the pixel.
+
     Returns:
         Angle to rotate beam.
     """
@@ -60,7 +61,7 @@ def calculate_rotation_point(point_1: np.ndarray,
 
     This method calculates the rotation point (rp) by finding:
 
-    [1 - R(rotation)](x - R(rotation)x)
+    rotation_point = [1 - R(rotation)](x - R(rotation)x)
 
     where R(\theta) is the 2D rotation matrix corresponding to a rotation
     by angle theta.
@@ -83,6 +84,8 @@ def calculate_rotation_point(point_1: np.ndarray,
         inverted_matrix = np.linalg.inv(np.identity(2) - rotation_matrix)
     except np.linalg.LinAlgError:
         raise  ValueError("1 - rotation matrix is singular.")
+
+    print(np.dot(rotation_matrix, point_1))
 
     return np.dot(inverted_matrix,
                   (point_2 - np.dot(rotation_matrix, point_1)))

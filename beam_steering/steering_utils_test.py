@@ -16,6 +16,8 @@ class testSteeringUtils(unittest.TestCase):
 
         calculated_angle = steering_utils.calculate_angle(point, rotation_center)
 
+
+
     def testCalculateAngle(self):
         real_angle = .617
 
