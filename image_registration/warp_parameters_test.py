@@ -18,9 +18,19 @@ class warpParametersTest(tf.test.TestCase):
       sess.run(tf.global_variables_initializer())
       elastic_warp_eval = elastic_warp.eval()
 
-    self.assertAllClose(elastic_warp_eval, [0.] * 10, atol=3. )
+    self.assertAllClose(elastic_warp_eval, [[0., 0.]] * 10, atol=3. )
 
-  def test_make_elastic_warp_variable(self):
+  def test_make_elastic_warp_variable_initialized(self):
+
+    elastic_warp = warp_parameters.make_elastic_warp_variable(10, [[1., 4.]] * 10)
+
+    with self.test_session() as sess:
+      sess.run(tf.global_variables_initializer())
+      elastic_warp_eval = elastic_warp.eval()
+
+    self.assertAllClose(elastic_warp_eval, [[1., 4.]] * 10)
+
+  def test_make_rotation_warp_variable(self):
 
     rotation = warp_parameters.make_rotation_warp_variable(10.)
 

@@ -13,17 +13,16 @@ tfe = tf.contrib.eager
 
 def make_elastic_warp_variable(
     num_control_points: Union[tf.Tensor, int],
-    scale: float = 1.,
-    initial_offsets: Optional[tf.Tensor] = None,
+    initial_offsets_or_scale: Union[float, List[List[float]]],
     trainable: Optional[bool] = True,
 ) -> tf.Tensor:
-  '''Creates variable to parameterize non-rigid warp.
+  '''Creates variable to paramaterize non-rigid warp.
 
   Args:
-    control_points: tf.Tensor of shape [num_control_points, 2].
+    num_control_points: tf.Tensor or int.
     scale:  Determines scale of random variation from `initial_guess`.
     initial_offsets:  Array shape [N, 2] where N is num_control_points. Can
-      choose either `scale` or `intial_offsets` to intialize warp.
+      choose either `scale` or `initial_offsets` to initialize warp.
     trainable: Set variables to be trainable.
 
   Returns:
@@ -31,21 +30,20 @@ def make_elastic_warp_variable(
   '''
 
   with tf.variable_scope("elastic_warp"):
-    if initial_offsets is not None:
-      assert initial_offsets.get_shape() == tf.TensorShape(
-        [num_control_points, 2])
+    if isinstance(initial_offsets_or_scale, List):
+      assert len(initial_offsets_or_scale) == num_control_points
 
       elastic_warp_points = tfe.Variable(
-        initial_offsets,
+        initial_offsets_or_scale,
         dtype=tf.float32,
         trainable=trainable,
       )
 
     else:
-      assert isinstance(scale, (int, float))
+      assert isinstance(initial_offsets_or_scale, float)
       elastic_warp_points = tfe.Variable(
         tf.random_uniform([num_control_points, 2], minval=-1,
-                          maxval=1) * scale,
+                          maxval=1) * initial_offsets_or_scale,
         dtype=tf.float32,
         trainable=trainable,
       )
