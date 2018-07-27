@@ -54,3 +54,4 @@ def project_rotation_on_control_points(
     tf.tensordot(rotation_matrix, centered_control_points, [[1], [1]]), [1, 0])
 
   return centered_rotation_points - centered_control_points
+
