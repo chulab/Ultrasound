@@ -30,8 +30,9 @@ class ElasticImage():
                name="elastic_image"
                ):
 
-    self.image = image
-    self.control_points = control_points
+    self.image = tf.convert_to_tensor(image)
+    self.control_points = tf.convert_to_tensor(control_points)
+    self.center_point = tf.cast(tf.shape(self.image) / 2., tf.float32)
     self.name = name
 
     self.variable_dict = defaultdict(list)
@@ -42,7 +43,7 @@ class ElasticImage():
 
   @image.setter
   def image(self, image):
-    if len(image.get_shape()) != 2:
+    if len(image.shape) != 2:
       raise ValueError("""Image has incorrect dimension. 
       Should have 2 dimensions, got {}""".format(len(image.get_shape())))
     self._image = image
@@ -54,6 +55,14 @@ class ElasticImage():
   @control_points.setter
   def control_points(self, control_points):
     self._control_points = control_points
+
+  @property
+  def center_point(self):
+    return self._center_point
+
+  @center_point.setter
+  def center_point(self, center_point):
+    self._center_point = center_point
 
   @property
   def name(self):
