@@ -50,12 +50,14 @@ def make_elastic_warp_variable(
 
   return elastic_warp_points
 
+
 def make_rotation_warp_variable(
     initial_rotation: Optional[float]=None,
     trainable: Optional[bool]=True,
 )-> tf.Tensor:
   """Sets up rotation warp variable."""
   return tfe.Variable(initial_rotation, trainable=trainable)
+
 
 def make_translation_warp_variable(
     initial_translation: Optional[List[float]]=None,
