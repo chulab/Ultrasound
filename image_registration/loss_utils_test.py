@@ -40,7 +40,10 @@ class testLossFunctions(tf.test.TestCase):
 
     def test_warp_loss_range_one(self):
 
-        t = tf.constant([])
+        t = tf.constant([[[[0,0], [1,0] , [0,0]],
+                          [[0,0], [1,0] , [0,0]],
+                          [[0,0], [1,0] , [0,0]],]],
+                        dtype = tf.float32)
 
         loss = loss_utils.warp_loss(t, 1)
 
@@ -49,7 +52,7 @@ class testLossFunctions(tf.test.TestCase):
 
         print(loss_eval)
 
-        self.assertAllClose(loss_eval, 10222.2)
+        self.assertAllClose(loss_eval, 0.0930984)
 
 
 if __name__ == '__main__':
