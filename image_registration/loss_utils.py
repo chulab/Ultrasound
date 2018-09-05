@@ -64,7 +64,7 @@ def masked_mse(
         return tf.reduce_sum(tf.pow(differences, 2)) / \
                tf.count_nonzero(differences, dtype=tf.int32)
     else:
-        return tf.reduce_sum(tf.pow(differences, 2)) / tf.size(values)
+        return tf.reduce_sum(tf.pow(differences, 2)) / tf.cast(tf.size(values), tf.float32)
 
 def warp_loss(dense_warp, correlation_range):
     """Constructs regularization loss on dense warp matrix.
