@@ -172,7 +172,7 @@ for step in range(num_steps):
 
     warp_loss = loss_utils.warp_loss(tf.reshape(image_a.get_list_from_variable_dict("non_rigid"), [1, warp_points[0], warp_points[1], 2]), 1)
 
-    total_loss = warp_loss + mse_loss
+    total_loss =  mse_loss + warp_loss
 
   grads = tape.gradient(total_loss, warp_variables)
 
@@ -208,17 +208,22 @@ warp_values += [image_a.get_list_from_variable_dict("translation")[0][tf.newaxis
 # Non-rigid
 warp_values += image_a.get_list_from_variable_dict("non_rigid")
 
+
+print(warp_values)
+warp_points = tf.zeros_like(warp_values[0])
+for warp_list in warp_values:
+  warp_points = warp_points + warp_list
+
 warp_values = [var[tf.newaxis, :, :] for var in warp_values]
 
 warped_image, dense_warp = warp.sparse_warp(image, control_points, warp_values, 1.)
-
 initial_image, _ = warp.sparse_warp(image, control_points, warp_values[:-1], 1.)
 
 
 
 fig, ax = plt.subplots(2,2, figsize=(15,15))
 visualization_utils.plot_displacement_vectors(image_a.control_points,
-                          image_a.get_list_from_variable_dict("translation")[0][tf.newaxis, :],
+                                              warp_points,
                           [image_a.image.numpy(), warped_image[0, :, :, 0].numpy()], ax[0, 0])
 ax[0, 0].set_title("Optimized warp.")
 
