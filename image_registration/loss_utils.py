@@ -56,17 +56,17 @@ def masked_mse(
   differences = tf.transpose(
     tf.matrix_band_part(tf.transpose(differences, (2, 0, 1), ), -1, 0),
     (1, 2, 0), )
-
+  
   # Mask invalid MSE entries is a mask is provided.
   if mask_list:
-    masks = tf.stack(mask_list)
-    masks = tf.reshape(masks, [masks.shape[0], -1])
-    overlaps = tf.expand_dims(masks, 0) * tf.expand_dims(masks, 1)
-    differences = differences * overlaps
-    return tf.reduce_sum(tf.pow(differences, 2)) / \
-           tf.count_nonzero(differences, dtype=tf.int32)
+      masks = tf.stack(mask_list)
+      masks = tf.reshape(masks, [masks.shape[0], -1])
+      overlaps = tf.expand_dims(masks, 0) * tf.expand_dims(masks, 1)
+      differences = differences * overlaps
+      return tf.reduce_sum(tf.pow(differences, 2)) / \
+             tf.count_nonzero(differences, dtype=tf.int32)
   else:
-    return tf.reduce_sum(tf.pow(differences, 2)) / tf.size(values)
+      return tf.reduce_sum(tf.pow(differences, 2)) / tf.cast(tf.size(values), tf.float32)
 
 
 def warp_loss(dense_warp, correlation_range):

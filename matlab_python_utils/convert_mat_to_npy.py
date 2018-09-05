@@ -51,8 +51,8 @@ def convert_mat_to_numpy(data_location:str,
 np.save(save_file, raw_data)
 
 
-if __name__ = "__main__":
+if __name__ == "__main__":
   convert_mat_to_numpy(
-  data_location = "../../raw_data/balloon_wrist/",
-  file_name= "movie_water.mat"
+  data_location = "../ultrasound_data/",
+  file_name= "img.mat"
   )
