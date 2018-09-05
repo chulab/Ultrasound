@@ -49,29 +49,31 @@ def plot_displacement_vectors(
       displacement_vector,
       images=None,
       axes=None, ):
-    """Plots a vector field given control points and displacement vectors.
+  """Plots a vector field given control points and displacement vectors.
 
-    The displacement vector measures the displacement of a point from the old image point to the grid point.
+  The displacement vector measures the displacement of a point from the old
+  image point to the grid point.
 
-    Args:
-        control_points: Array of shape [N, 2]
-        displacement_vector: Array of shape [N, 2]
-        image: Optional List of image arrays of shape [H, W] to display behind vector field.
-        axes: Axes on which to plot.
-    """
+  Args:
+      control_points: Array of shape [N, 2]
+      displacement_vector: Array of shape [N, 2]
+      image: Optional List of image arrays of shape [H, W] to display behind
+      vector field.
+      axes: Axes on which to plot.
+  """
 
-    X = control_points[:, 0]
-    Y = control_points[:, 1]
+  X = control_points[:, 0]
+  Y = control_points[:, 1]
 
-    U = displacement_vector[:, 0]
-    V = displacement_vector[:, 1]
+  U = displacement_vector[:, 0]
+  V = displacement_vector[:, 1]
 
-    if axes is not None:
-      if images is not None:
-        axes.imshow(multiple_intensity_to_rgb(*images))
-      axes.quiver(Y, X, V, U, angles='xy', pivot='tip', color='r')
+  if axes is not None:
+    if images is not None:
+      axes.imshow(multiple_intensity_to_rgb(*images))
+    axes.quiver(Y, X, V, U, angles='xy', pivot='tip', color='r')
 
-    else:
-      if images is not None:
-        plt.imshow(multiple_intensity_to_rgb(*images))
-      plt.quiver(Y, X, V, U, angles='xy', pivot='tip', color='r')
+  else:
+    if images is not None:
+      plt.imshow(multiple_intensity_to_rgb(*images))
+    plt.quiver(Y, X, V, U, angles='xy', pivot='tip', color='r')
