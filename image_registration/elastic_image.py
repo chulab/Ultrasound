@@ -52,7 +52,8 @@ class ElasticImage():
     return self._control_points
 
   @control_points.setter
-  def control_points(self, control_points):
+  def control_points(self, control_points: tf.Tensor):
+    control_points.shape.assert_is_compatible_with([None, 2])
     self._control_points = control_points
 
   @property
@@ -60,7 +61,7 @@ class ElasticImage():
     return self._center_point
 
   @center_point.setter
-  def center_point(self, center_point):
+  def center_point(self, center_point: tf.Tensor):
     self._center_point = center_point
 
   @property
@@ -71,17 +72,29 @@ class ElasticImage():
   def name(self, name):
     self._name = name
 
-  def add_to_variable_dict(self,
-                           variable,
-                           type=None):
-    '''Adds a new variable to the variable dictionary.'''
-    self.variable_dict['all_variables'].append(variable)
+  @property
+  def translation(self):
+    return self._translation
 
-    if type is not None:
-      assert isinstance(type, str)
-      self.variable_dict[type].append(variable)
+  @translation.setter
+  def translation(self, translation: tf.Tensor):
+    translation.shape.assert_is_compatible_with([2])
+    self._translation = translation
 
-  def get_list_from_variable_dict(self,
-                                  type='all_variables'):
-    assert type in self.variable_dict
-    return self.variable_dict[type]
+  @property
+  def rotation(self):
+    return self._rotation
+
+  @rotation.setter
+  def rotation(self, rotation: tf.Tensor):
+    rotation.shape.assert_has_rank(0)
+    self._rotation = rotation
+
+  @property
+  def non_rigid(self):
+    return self._non_rigid
+
+  @non_rigid.setter
+  def non_rigid(self, non_rigid: tf.Tensor):
+    non_rigid.shape.assert_is_compatible_with(self._control_points.shape)
+    self._non_rigid = non_rigid

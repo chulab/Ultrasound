@@ -2,38 +2,56 @@
 
 import tensorflow as tf
 
-import elastic_image
+from image_registration import elastic_image
 
 
 class elasticImageTests(tf.test.TestCase):
 
   def setUp(self):
     tf.reset_default_graph()
+    self.image = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    self.control_points = tf.constant([[0, 0], [1, 1]])
+    self.ei = elastic_image.ElasticImage(self.image, self.control_points)
+
+  def testElasticImageBadControlPoints(self):
+    image = tf.constant([[1,2,3], [4,5,6], [7,8,9]])
+    control_points = tf.constant([[0], [1]])
+    with self.assertRaises(ValueError):
+       elastic_image.ElasticImage(image, control_points)
 
   def testElasticImage(self):
-    image = tf.constant([[1,2,3], [4,5,6], [7,8,9]])
-    control_points = tf.constant([[0, 0], [1,1]])
-    var = tf.constant([1,2,3])
-
-    ei = elastic_image.ElasticImage(image, control_points)
-    ei.add_to_variable_dict(var, "test_type")
-
-    image_test = ei.image
-    control_points_test = ei.control_points
-    var_test_list = ei.get_list_from_variable_dict("test_type")
-
     with self.test_session() as sess:
       self.assertAllClose(
-        image.eval(),
-        image_test.eval()
+        self.image.eval(),
+        self.ei.image.eval()
       )
       self.assertAllClose(
-        control_points.eval(),
-        control_points_test.eval()
+        self.control_points.eval(),
+        self.ei.control_points.eval()
       )
+
+  def testElasticImageBadRotation(self):
+    with self.assertRaises(ValueError):
+      self.ei.rotation = tf.constant([1.])
+
+  def testElasticImageRotation(self):
+    self.ei.rotation = tf.constant(1.)
+    with self.test_session() as sess:
       self.assertAllClose(
-        var_test_list[0].eval(),
-        var.eval()
+        self.ei.rotation.eval(),
+        1.
+      )
+
+  def testElasticImageBadTranslation(self):
+    with self.assertRaises(ValueError):
+      self.ei.translation = tf.constant([1., 2, 3])
+
+  def testElasticImageTranslation(self):
+    self.ei.translation = tf.constant([1., 2.])
+    with self.test_session() as sess:
+      self.assertAllClose(
+        self.ei.translation.eval(),
+        [1., 2]
       )
 
 
