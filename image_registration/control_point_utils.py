@@ -29,14 +29,13 @@ def project_rotation_on_control_points(
      = control_point_image[i] - control_point[i]
 
   Args:
-    control_points: tf.Tensor of shape [batch_size, 2].
-    center_point: tf.Tensor of shape [2].
-    rotation: tf.Tensor of shape [].  Represents rotation in degrees clockwise.
+    control_points: `tf.Tensor` of shape `[batch_size, num_points, 2]`.
+    center_point: `tf.Tensor` compatible with `control_points`.
+    rotation: Scalar `tf.Tensor`.  Represents rotation in degrees clockwise.
 
   Returns:
     tf.Tensor of same shape as `control_points`.
   """
-
   # Center coordinate grid at `center_point`.
   centered_control_points = control_points - center_point
 
@@ -48,9 +47,9 @@ def project_rotation_on_control_points(
       tf.sin(rotation_radians),
       tf.cos(rotation_radians),
   ]),
-    shape=[2, 2])
+    shape=[-1, 2, 2])
 
-  centered_rotation_points = tf.transpose(
-    tf.tensordot(rotation_matrix, centered_control_points, [[1], [1]]), [1, 0])
+  centered_rotation_points = tf.einsum(
+    'bij,bnj->bni', rotation_matrix, centered_control_points)
 
   return centered_rotation_points - centered_control_points
