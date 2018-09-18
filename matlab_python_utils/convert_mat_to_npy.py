@@ -23,7 +23,9 @@ def convert_mat_to_numpy(data_location:str,
 
   temp_data = sio.loadmat(file_name)
 
-  raw_data = temp_data['movie_int']
+  print(temp_data)
+
+  raw_data = temp_data['img']
 
   raw_data = np.swapaxes(raw_data,2,0)
   raw_data = np.swapaxes(raw_data,1,2)
@@ -48,11 +50,11 @@ def convert_mat_to_numpy(data_location:str,
   # # zoom_ratio = (512 / 1456) * (28 / 23)
   # # im_zoomed = ndimage.zoom(scaled_data, zoom=(1, zoom_ratio, 1), order=1)
   save_file = os.path.join(data_location,"raw_images")
-np.save(save_file, raw_data)
+  np.save(save_file, raw_data)
 
 
 if __name__ == "__main__":
   convert_mat_to_numpy(
-  data_location = "../ultrasound_data/",
+  data_location = "../../raw_data/9_1_phantom",
   file_name= "img.mat"
   )
