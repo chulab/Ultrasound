@@ -74,8 +74,11 @@ def dense_warp(image,
 
   with tf.variable_scope("dense_warp"):
     image_sz = image.shape
-    control_point_shape = tf.TensorShape([image_sz[1], image_sz[2], 2])
+    control_point_shape = tf.TensorShape([image_sz[0], image_sz[1], image_sz[2], 2])
     warp_points = total_warp_points(warp_values, control_point_shape)
+
+    image = tf.cast(image, tf.float32)
+    warp_points = tf.cast(warp_points, image.dtype)
     return dense_image_warp(image, warp_points)
 
 
