@@ -9,13 +9,11 @@ class imageProcessingUtilsTests(tf.test.TestCase):
   def setUp(self):
     tf.reset_default_graph()
 
-  def test_project_rotation_on_control_points(self):
-
-    control_points = tf.constant([[[1., 0],
-                                  [0., 1.]]])
+  def testProjectRotationOnControlPoints(self):
+    control_points = tf.constant([[1., 0],
+                                   [0., 1.]])
 
     center_point = tf.constant([1., 0])
-    center_point = center_point[tf.newaxis, tf.newaxis, :]
 
     rotation = tf.constant(30.)
 
@@ -29,9 +27,9 @@ class imageProcessingUtilsTests(tf.test.TestCase):
 
     self.assertAllClose(
       rotated_point_eval,
-      [[[0, 0.],
-       [-0.366, -0.634]]],
-      atol = .001
+      [[0, 0.],
+        [-0.366, -0.634]],
+      atol=.001
     )
 
 

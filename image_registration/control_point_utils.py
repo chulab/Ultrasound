@@ -12,6 +12,13 @@ x-y indexing). For example, the positions [1,2] and [4, 3] will correspond to:
 
 import tensorflow as tf
 
+def prepare_translation(
+    translation: tf.Tensor,
+):
+  """Makes `translation` compatible with `control_points`."""
+  translation.shape.assert_is_compatible_with([2])
+  return translation[tf.newaxis, :]
+
 def project_rotation_on_control_points(
     control_points: tf.Tensor,
     center_point: tf.Tensor,
@@ -35,7 +42,13 @@ def project_rotation_on_control_points(
 
   Returns:
     tf.Tensor of same shape as `control_points`.
+
+  Raises:
+    ValueError: If `rotation` is not scalar.
   """
+  rotation.shape.assert_is_compatible_with([])
+  control_points.shape.assert_is_compatible_with([None, 2])
+
   # Center coordinate grid at `center_point`.
   centered_control_points = control_points - center_point
 
@@ -47,9 +60,9 @@ def project_rotation_on_control_points(
       tf.sin(rotation_radians),
       tf.cos(rotation_radians),
   ]),
-    shape=[-1, 2, 2])
+    shape=[2, 2])
 
   centered_rotation_points = tf.einsum(
-    'bij,bnj->bni', rotation_matrix, centered_control_points)
+    'ij,nj->ni', rotation_matrix, centered_control_points)
 
   return centered_rotation_points - centered_control_points
