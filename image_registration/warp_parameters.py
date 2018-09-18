@@ -12,8 +12,8 @@ tfe = tf.contrib.eager
 
 
 def make_elastic_warp_variable(
-    num_control_points: Union[tf.Tensor, int],
-    initial_offsets_or_scale: Union[float, List[List[float]]],
+    control_points_shape: tf.TensorShape,
+    initial_offsets_or_scale: Union[float, List[List[List[float]]]],
     trainable: Optional[bool] = True,
 ) -> tf.Tensor:
   '''Creates variable to paramaterize non-rigid warp.
@@ -26,13 +26,11 @@ def make_elastic_warp_variable(
     trainable: Set variables to be trainable.
 
   Returns:
-    tf.Variable of shape [num_control_points, 2].
+    tf.Variable of shape [batch_size, control_point_count, 2].
   '''
 
   with tf.variable_scope("elastic_warp"):
     if isinstance(initial_offsets_or_scale, List):
-      assert len(initial_offsets_or_scale) == num_control_points
-
       elastic_warp_points = tfe.Variable(
         initial_offsets_or_scale,
         dtype=tf.float32,
@@ -42,7 +40,7 @@ def make_elastic_warp_variable(
     else:
       assert isinstance(initial_offsets_or_scale, float)
       elastic_warp_points = tfe.Variable(
-        tf.random_uniform([num_control_points, 2], minval=-1,
+        tf.random_uniform(control_points_shape, minval=-1,
                           maxval=1) * initial_offsets_or_scale,
         dtype=tf.float32,
         trainable=trainable,
@@ -52,7 +50,7 @@ def make_elastic_warp_variable(
 
 
 def make_rotation_warp_variable(
-    initial_rotation: Optional[float]=None,
+    initial_rotation: Optional[Union[float, List[float]]]=None,
     trainable: Optional[bool]=True,
 )-> tf.Tensor:
   """Sets up rotation warp variable."""
@@ -60,10 +58,14 @@ def make_rotation_warp_variable(
 
 
 def make_translation_warp_variable(
-    initial_translation: Optional[List[float]]=None,
+    initial_translation: Optional[List[List[float]]]=None,
     trainable: Optional[bool]=True,
 ) -> tf.Tensor:
-  """Sets up translation warp variable."""
+  """Sets up translation warp variable.
+
+  Returns:
+    `tf.Tensor` of shape `[batch_size, 2]`.
+  """
   if initial_translation is None:
-    initial_translation = [0., 0.]
+    initial_translation = [[0., 0.]]
   return tfe.Variable(initial_translation, trainable=trainable)
