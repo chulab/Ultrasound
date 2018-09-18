@@ -18,13 +18,11 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from future import standard_library
-standard_library.install_aliases()
 import numpy as np
 import tensorflow as tf
 
-from modified_dense_image_warp import dense_image_warp
-from modified_interpolate_spline import interpolate_spline
+from modified_tf.modified_dense_image_warp import dense_image_warp
+from modified_tf.modified_interpolate_spline import interpolate_spline
 
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import ops

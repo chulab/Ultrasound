@@ -19,9 +19,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from builtins import str
-from future import standard_library
-standard_library.install_aliases()
-import numpy as np
 
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
