@@ -39,9 +39,9 @@ def load_image(
     ValueError: if `control_points` has an invalid shape.
   """
 
-  if len(control_points.shape) != 2 or control_points.shape[1] != 2:
-    raise ValueError("""`control_points` must have shape [N, 2] got \
-      {}""".format(control_points.shape))
+  if not control_points.shape.is_compatible_with([None, 2]):
+    raise ValueError("`control_points` must be compatible with [None, 2] got "
+      "{}".format(control_points.shape))
 
   eimage = elastic_image.ElasticImage(image, control_points, )
 
