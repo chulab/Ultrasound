@@ -45,15 +45,27 @@ class warpParametersTest(tf.test.TestCase):
 
     self.assertAllClose(rotation_eval, 10.)
 
+  def testMakeRotationWarpVariableBadArgs(self):
+    with self.assertRaises(ValueError):
+      warp_parameters.make_rotation_warp_variable([10, 2])
+
   def test_make_translation_warp_variable(self):
 
-    translation = warp_parameters.make_translation_warp_variable([[1.,2.]])
+    translation = warp_parameters.make_translation_warp_variable([1.,2.])
 
     with self.test_session() as sess:
       sess.run(tf.global_variables_initializer())
       translation_eval = translation.eval()
 
-    self.assertAllClose(translation_eval, [[1., 2.]])
+    self.assertAllClose(translation_eval, [1., 2.])
+
+  def testMakeTranslationWarpVariableBadArgs(self):
+    with self.assertRaises(ValueError):
+      warp_parameters.make_translation_warp_variable([10, 2, 3])
+
+  def testMakeTranslationWarpVariableBadArgsListofList(self):
+    with self.assertRaises(ValueError):
+      warp_parameters.make_translation_warp_variable([[1], [2]])
 
 if __name__ == '__main__':
   tf.test.main()
