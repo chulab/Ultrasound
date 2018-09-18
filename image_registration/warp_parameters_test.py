@@ -2,8 +2,7 @@
 
 import tensorflow as tf
 
-import warp_parameters
-
+from image_registration import warp_parameters
 
 class warpParametersTest(tf.test.TestCase):
 
