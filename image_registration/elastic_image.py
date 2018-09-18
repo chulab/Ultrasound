@@ -11,7 +11,7 @@ class ElasticImage():
   '''An ElasticImage contains an image and associated registration parameters.
 
   Args:
-    image: tf.Tensor of shape [H, W]
+    image: `tf.Tensor` of shape [H, W]
     control_points: tf.Tensor of shape [num_points, 2].
     name: str.
 
@@ -29,10 +29,9 @@ class ElasticImage():
                control_points,
                name="elastic_image"
                ):
-
-    self.image = tf.convert_to_tensor(image)
-    self.control_points = tf.convert_to_tensor(control_points)
-    self.center_point = tf.cast(tf.shape(self.image) / 2., tf.float32)
+    self.image = image
+    self.control_points = control_points
+    self.center_point = tf.cast(tf.shape(image) / tf.constant(2), tf.float32)
     self.name = name
 
     self.variable_dict = defaultdict(list)
