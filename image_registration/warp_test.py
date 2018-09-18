@@ -123,6 +123,21 @@ class TestWarp(tf.test.TestCase):
     self.assertEqual(resized_image.shape.as_list(), [1, 5, 5, 1])
     with self.test_session() as sess:
         self.assertAllEqual(sess.run(resized_image), np.ones([1, 5, 5, 1]))
+  
+  def testSoftIsCompatibleWith(self):
+    self.assertTrue(
+      warp.soft_is_compatible_with(tf.TensorShape([1,2,3]),
+                                   tf.TensorShape([2,2,3]))
+    )
+    self.assertFalse(
+      warp.soft_is_compatible_with(tf.TensorShape([3, 2, 3]),
+                                   tf.TensorShape([2, 2, 3]))
+    )
+    self.assertFalse(
+      warp.soft_is_compatible_with(tf.TensorShape([2, 2, 5]),
+                                   tf.TensorShape([2, 2, 3]))
+    )
+
 
 if __name__ == '__main__':
   tf.test.main()

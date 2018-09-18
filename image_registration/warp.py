@@ -38,7 +38,6 @@ def sparse_warp(image: tf.Tensor,
   """
 
   with tf.variable_scope("sparse_warp"):
-
     warp_points = total_warp_points(warp_values, control_points.shape)
     destination_control_points = warp_points + control_points
 
@@ -267,16 +266,25 @@ def total_warp_points(warp_list: List[tf.Tensor],
     ValueError: If a `tf.Tensor` in `warp_list` does not have shape
     compatible with `control_point_shape`.
   """
-  if not all(tensor.shape.is_compatible_with(control_point_shape) for tensor
-             in warp_list):
+  if not all(soft_is_compatible_with(tensor.shape, control_point_shape)
+             for tensor in warp_list):
     raise ValueError("All warp tensors should have shape compatible with {}, "
                      "got {}".format(control_point_shape,
                                      [tensor.shape for tensor in warp_list]
                                      ))
 
-  total_warp_tensor = tf.zeros(control_point_shape, dtype=warp_list[0].dtype)
+  total_warp_tensor = tf.zeros(control_point_shape)
 
   for warp_tensor in warp_list:
     total_warp_tensor = total_warp_tensor + warp_tensor
 
   return total_warp_tensor
+
+def soft_is_compatible_with(
+  shape_1: tf.TensorShape,
+  shape_2: tf.TensorShape,
+):
+  return all(dimension_1.is_compatible_with(1) or
+           dimension_2.is_compatible_with(1) or
+           dimension_1.is_compatible_with(dimension_2)
+           for dimension_1, dimension_2 in zip(shape_1, shape_2))
