@@ -1,4 +1,4 @@
-"""Defines ImageField class."""
+"""Image loading utils."""
 
 from __future__ import division
 from __future__ import print_function
@@ -21,6 +21,9 @@ def load_image(
 ):
   """Creates ElasticImage object with variables for registration.
 
+  Convenience function that wraps instantiation of `ElasticImage` as well
+  as variable creation using `warp_parameters`.
+
   Args:
     image: `tf.Tensor` of shape `[height, width]`.
     control_points: `tf.Tensor` of shape `[num_control_points, 2]`. Describes
@@ -37,23 +40,26 @@ def load_image(
 
   Raises:
     ValueError: if `control_points` has an invalid shape.
+
   """
 
   if not control_points.shape.is_compatible_with([None, 2]):
-    raise ValueError("`control_points` must be compatible with [None, 2] got "
-      "{}".format(control_points.shape))
+    raise ValueError("`control_points` must be compatible with [None, 2]"
+      "got {}".format(control_points.shape))
 
-  eimage = elastic_image.ElasticImage(image, control_points, )
+  eimage = elastic_image.ElasticImage(image, control_points)
 
-  rotation = warp_parameters.make_rotation_warp_variable(initial_rotation, )
-  eimage.add_to_variable_dict(rotation, "rotation")
+  control_points_shape = eimage.control_points.shape
+
+  rotation = warp_parameters.make_rotation_warp_variable(initial_rotation)
+  eimage.rotation = rotation
 
   translation = warp_parameters.make_translation_warp_variable(
-    initial_translation, )
-  eimage.add_to_variable_dict(translation, "translation")
+    initial_translation)
+  eimage.translation = translation
 
   non_rigid = warp_parameters.make_elastic_warp_variable(
-    control_points.get_shape().as_list()[0], initial_non_rigid_values_or_scale)
-  eimage.add_to_variable_dict(non_rigid, "non_rigid")
+    control_points_shape, initial_non_rigid_values_or_scale)
+  eimage.non_rigid = non_rigid
 
   return eimage
