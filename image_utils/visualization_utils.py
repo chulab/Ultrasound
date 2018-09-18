@@ -45,8 +45,8 @@ def multiple_intensity_to_rgb(im_1: np.ndarray,
 
 
 def plot_displacement_vectors(
-      control_points,
-      displacement_vector,
+      control_points: np.ndarray,
+      displacement_vector: np.ndarray,
       images=None,
       axes=None, ):
   """Plots a vector field given control points and displacement vectors.
@@ -55,12 +55,21 @@ def plot_displacement_vectors(
   image point to the grid point.
 
   Args:
-      control_points: Array of shape [N, 2]
-      displacement_vector: Array of shape [N, 2]
-      image: Optional List of image arrays of shape [H, W] to display behind
-      vector field.
-      axes: Axes on which to plot.
+    control_points: Array of shape [N, 2]
+    displacement_vector: Array of shape [N, 2]
+    image: Optional List of image arrays of shape [H, W] to display behind
+    vector field.
+    axes: Axes on which to plot.
+
+  Raises:
+    ValueError: If `control_points` or `displacement_vectors` have improper
+      shape.
   """
+  if not control_points.shape == displacement_vector.shape:
+    raise ValueError("`control_points` and `displacement_vector` must have"
+                     "the same shape, got {}".format(
+      [control_points, displacement_vector]))
+
 
   X = control_points[:, 0]
   Y = control_points[:, 1]
