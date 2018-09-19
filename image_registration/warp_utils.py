@@ -111,7 +111,7 @@ def rotate_points(
      = control_point_image[i] - control_point[i]
 
   Args:
-    points: `tf.Tensor` of shape `[batch_size, num_points, 2]`.
+    points: `tf.Tensor` of shape `[num_points, 2]`.
     center_point: `tf.Tensor` compatible with `points`.
     rotation: Scalar `tf.Tensor`.  Represents rotation in degrees clockwise.
 
@@ -125,6 +125,7 @@ def rotate_points(
   points.shape.assert_is_compatible_with([None, 2])
 
   # Center coordinate grid at `center_point`.
+  center_point = tf.cast(center_point, points.dtype)
   centered_points = points - center_point
 
   rotation_radians = rotation * 2 * 3.1415 / 360
@@ -137,7 +138,7 @@ def rotate_points(
   ]),
     shape=[2, 2])
 
-  rotation_matrix = tf.cast(rotation_matrix, centered_points.dtype)
+  rotation_matrix = tf.cast(rotation_matrix, points.dtype)
 
   centered_rotation_points = tf.einsum(
     'ij,nj->ni', rotation_matrix, centered_points)
