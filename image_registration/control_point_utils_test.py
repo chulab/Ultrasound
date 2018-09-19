@@ -9,6 +9,18 @@ class imageProcessingUtilsTests(tf.test.TestCase):
   def setUp(self):
     tf.reset_default_graph()
 
+  def testPrepareTranslation(self):
+    translation = tf.constant([1,2])
+    with self.test_session():
+      self.assertAllClose(
+        control_point_utils.prepare_translation(translation).eval(),
+        [[1,2]]
+      )
+
+  def testPrepareTranslationBadArgs(self):
+    with self.assertRaises(ValueError):
+      control_point_utils.prepare_translation(tf.constant([[1, 2]]))
+
   def testProjectRotationOnControlPoints(self):
     control_points = tf.constant([[1., 0],
                                    [0., 1.]])

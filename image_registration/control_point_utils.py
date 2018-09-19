@@ -11,6 +11,80 @@ x-y indexing). For example, the positions [1,2] and [4, 3] will correspond to:
 """
 
 import tensorflow as tf
+from image_registration import elastic_image
+
+
+def warp_tensor(
+  elastic_image: elastic_image.ElasticImage,
+  rotation: bool,
+  translation: bool,
+  non_rigid: bool
+):
+  """Prepares variables from `ElasticImage` for warp operations.
+
+  Same `warp_variables` but prepares each variable for warp operations by using
+  the apropriate preparation function from `warp_utils`.
+
+  Note that this function returns objects from both `tf.Tensor` and
+  `tf.Variable` nodes depending on which variables are requested.
+
+  Args:
+    elastic_image: `ElasticImage` object.
+    rotation: bool. If `True` then the prepared rotation variable is added to
+      the list of returned tensors.
+    translation: Same as `rotation` but for translation variable.
+    non_rigid: Same as `rotation` but for non_rigid variable.
+
+  Returns:
+    variables: List of `tf.Tensor` corresponding requested variables.
+  """
+  tensors = []
+
+  if rotation:
+    tensors += [project_rotation_on_control_points(
+      elastic_image.control_points, elastic_image.center_point,
+      elastic_image.rotation)]
+  if translation:
+    tensors += [prepare_translation(translation)]
+  if non_rigid:
+    tensors += [elastic_image.non_rigid]
+
+  # Update shape of tensors so they have correct dimension for warp functions.
+  # [batch_size, point_count, 2]
+  return [warp_tensor[tf.newaxis, :, :] for warp_tensor in tensors]
+
+
+def warp_variables(
+  elastic_image: elastic_image.ElasticImage,
+  rotation: bool,
+  translation: bool,
+  non_rigid: bool
+):
+  """Retrieves variables from ElasticImage.
+
+  This utility function populates a list of warp variables from an
+  `ElasticImage`.
+
+  Args:
+    elastic_image: `ElasticImage` object.
+    rotation: bool. If `True` then the rotation variable is added to the list
+    of returned variables.
+    translation: Same as `rotation` but for translation variable.
+    non_rigid: Same as `rotation` but for non_rigid variable.
+
+  Returns:
+    variables: List of `tf.Variable` corresponding to selected variable types.
+  """
+  variables = []
+
+  if rotation:
+    variables += [elastic_image.rotation]
+  if translation:
+    variables += [elastic_image.translation]
+  if non_rigid:
+    variables += [elastic_image.non_rigid]
+  return variables
+
 
 def prepare_translation(
     translation: tf.Tensor,
@@ -18,6 +92,7 @@ def prepare_translation(
   """Makes `translation` compatible with `control_points`."""
   translation.shape.assert_is_compatible_with([2])
   return translation[tf.newaxis, :]
+
 
 def project_rotation_on_control_points(
     control_points: tf.Tensor,
@@ -55,10 +130,10 @@ def project_rotation_on_control_points(
   rotation_radians = rotation * 2 * 3.1415 / 360
 
   rotation_matrix = tf.reshape(tf.stack([
-      tf.cos(rotation_radians),
-      - tf.sin(rotation_radians),
-      tf.sin(rotation_radians),
-      tf.cos(rotation_radians),
+    tf.cos(rotation_radians),
+    - tf.sin(rotation_radians),
+    tf.sin(rotation_radians),
+    tf.cos(rotation_radians),
   ]),
     shape=[2, 2])
 
