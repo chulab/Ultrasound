@@ -169,7 +169,7 @@ def _warp_query(
     image: See documentation for `warp_query`.
     query_points: See documentation for `warp_query`.
     control_point_locations: `tf.Tensor` of shape
-      `[batch_size, point_count, 2]`.  Describes points that paramaterize
+      `[batch_size, point_count, 2]`.  Describes points that parametrize
       image warp.
     destination_control_points: `tf.Tensor` of same shape as
       `control_point_locations`.
@@ -245,7 +245,7 @@ def total_warp_points(warp_list: List[tf.Tensor],
                       control_point_shape: tf.TensorShape):
   """Generates a single warp point tensor from a list of warp tensors.
 
-  A single waro tensor is a `tf.Tensor` containing an X and Y displacement for
+  A single warp tensor is a `tf.Tensor` containing an X and Y displacement for
   each warp point in an image.  This function combines several warp tensors
   linearly to create a cumulative warp tensor.
 
