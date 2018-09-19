@@ -27,14 +27,14 @@ def sparse_warp(image: tf.Tensor,
   size (2 ^ `scale`).
 
   Args:
-      image: tf.Tensor of shape [B, H, W, C]
-      control_points: tf.Tensor of shape [B, num_control_points, 2].
-      warp_values: tf.Tensor of shape [B, num_control_points, 2].
-      scale: int tf.Tensor. Factors of 2.
+      image: `tf.Tensor` of shape `[B, H, W, C]`.
+      control_points: `tf.Tensor` of shape `[B, num_control_points, 2]`.
+      warp_values: `tf.Tensor` of shape `[B, num_control_points, 2]`.
+      scale: int `tf.Tensor`. Factors of 2.
 
   Returns:
-      warped image: image.  Tensor of shape [N, H, W, C]
-      dense warp: dense warp array. Tenosr of shape [N, H, W, 2]
+      warped image: image.  Tensor of shape `[N, H, W, C]`.
+      dense warp: dense warp array. Tensor of shape `[N, H, W, 2]`.
   """
 
   with tf.variable_scope("sparse_warp"):
@@ -51,11 +51,11 @@ def sparse_warp(image: tf.Tensor,
     else:
       new_image = image
 
-  warped, dense_mesh = sparse_image_warp(new_image,
-                                         control_points,
-                                         destination_control_points,
-                                         interpolation_order=2,
-                                         )
+    warped, dense_mesh = sparse_image_warp(new_image,
+                                           control_points,
+                                           destination_control_points,
+                                           interpolation_order=2,
+                                           )
 
   return warped, dense_mesh
 
