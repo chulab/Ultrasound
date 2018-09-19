@@ -3,7 +3,7 @@
 import tensorflow as tf
 import numpy as np
 
-from image_registration import control_point_utils
+from image_registration import warp_utils
 from image_registration import elastic_image
 
 class imageProcessingUtilsTests(tf.test.TestCase):
@@ -15,7 +15,7 @@ class imageProcessingUtilsTests(tf.test.TestCase):
     eim.rotation = tf.constant(0.)
     eim.translation = tf.constant([3,5])
     eim.non_rigid = tf.ones([5,2]) * 4
-    tensors = control_point_utils.warp_tensor(eim, True, True, True)
+    tensors = warp_utils.warp_tensor(eim, True, True, True)
     with self.test_session():
       self.assertAllClose(tensors[0].eval(), np.zeros([1, 5, 2]))
       self.assertAllClose(tensors[1].eval(), np.array([[[3, 5]]]))
@@ -26,7 +26,7 @@ class imageProcessingUtilsTests(tf.test.TestCase):
     eim.rotation = tf.constant(7.)
     eim.translation = tf.constant([3,5])
     eim.non_rigid = tf.zeros([5,2])
-    variables = control_point_utils.warp_variables(eim, True, True, True)
+    variables = warp_utils.warp_variables(eim, True, True, True)
     with self.test_session():
       self.assertAllClose(variables[0].eval(), 7)
       self.assertAllClose(variables[1].eval(), [3, 5])
@@ -37,13 +37,13 @@ class imageProcessingUtilsTests(tf.test.TestCase):
     translation = tf.constant([1,2])
     with self.test_session():
       self.assertAllClose(
-        control_point_utils.prepare_translation(translation).eval(),
+        warp_utils.prepare_translation(translation).eval(),
         [[1,2]]
       )
 
   def testPrepareTranslationBadArgs(self):
     with self.assertRaises(ValueError):
-      control_point_utils.prepare_translation(tf.constant([[1, 2]]))
+      warp_utils.prepare_translation(tf.constant([[1, 2]]))
 
   def testProjectRotationOnControlPoints(self):
     control_points = tf.constant([[1., 0],
@@ -54,7 +54,7 @@ class imageProcessingUtilsTests(tf.test.TestCase):
     rotation = tf.constant(30.)
 
     rotated_points = (
-      control_point_utils.project_rotation_on_control_points(
+      warp_utils.project_rotation_on_control_points(
         control_points, center_point, rotation)
     )
 
