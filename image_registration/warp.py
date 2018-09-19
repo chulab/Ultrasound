@@ -140,6 +140,7 @@ def warp_query(image: tf.Tensor,
 
   with tf.variable_scope("warp_query"):
     warp_points = total_warp_points(warp_values, control_points.shape)
+    control_points = tf.cast(control_points, warp_points.dtype)
     destination_control_points = warp_points + control_points
 
     if scale != 1:
