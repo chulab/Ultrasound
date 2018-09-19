@@ -137,6 +137,8 @@ def project_rotation_on_control_points(
   ]),
     shape=[2, 2])
 
+  rotation_matrix = tf.cast(rotation_matrix, centered_control_points.dtype)
+
   centered_rotation_points = tf.einsum(
     'ij,nj->ni', rotation_matrix, centered_control_points)
 
