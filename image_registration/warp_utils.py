@@ -41,7 +41,7 @@ def warp_tensor(
   tensors = []
 
   if rotation:
-    tensors += [project_rotation_on_control_points(
+    tensors += [rotate_points(
       elastic_image.control_points, elastic_image.center_point,
       elastic_image.rotation)]
   if translation:
@@ -94,38 +94,38 @@ def prepare_translation(
   return translation[tf.newaxis, :]
 
 
-def project_rotation_on_control_points(
-    control_points: tf.Tensor,
+def rotate_points(
+    points: tf.Tensor,
     center_point: tf.Tensor,
     rotation: tf.Tensor,
 ) -> tf.Tensor:
-  """Calculates displacement of control_points based on rotation.
+  """Calculates displacement of points based on rotation.
 
-  Calculates the displacement of each control point as they are rotated about
+  Calculates the displacement of each point as they are rotated about
   `center_point` by rotation `rotation` in a counter-clockwise direction.
 
-  Note that this is not the location of the `control_points` after rotation.
-  Rather, it is the vector between `control_points` and their rotated image.
+  Note that this is not the location of the `points` after rotation.
+  Rather, it is the vector between `points` and their rotated image.
   Explicitly,
 
      = control_point_image[i] - control_point[i]
 
   Args:
-    control_points: `tf.Tensor` of shape `[batch_size, num_points, 2]`.
-    center_point: `tf.Tensor` compatible with `control_points`.
+    points: `tf.Tensor` of shape `[batch_size, num_points, 2]`.
+    center_point: `tf.Tensor` compatible with `points`.
     rotation: Scalar `tf.Tensor`.  Represents rotation in degrees clockwise.
 
   Returns:
-    tf.Tensor of same shape as `control_points`.
+    tf.Tensor of same shape as `points`.
 
   Raises:
     ValueError: If `rotation` is not scalar.
   """
   rotation.shape.assert_is_compatible_with([])
-  control_points.shape.assert_is_compatible_with([None, 2])
+  points.shape.assert_is_compatible_with([None, 2])
 
   # Center coordinate grid at `center_point`.
-  centered_control_points = control_points - center_point
+  centered_points = points - center_point
 
   rotation_radians = rotation * 2 * 3.1415 / 360
 
@@ -137,9 +137,9 @@ def project_rotation_on_control_points(
   ]),
     shape=[2, 2])
 
-  rotation_matrix = tf.cast(rotation_matrix, centered_control_points.dtype)
+  rotation_matrix = tf.cast(rotation_matrix, centered_points.dtype)
 
   centered_rotation_points = tf.einsum(
-    'ij,nj->ni', rotation_matrix, centered_control_points)
+    'ij,nj->ni', rotation_matrix, centered_points)
 
-  return centered_rotation_points - centered_control_points
+  return centered_rotation_points - centered_points

@@ -54,7 +54,7 @@ class imageProcessingUtilsTests(tf.test.TestCase):
     rotation = tf.constant(30.)
 
     rotated_points = (
-      warp_utils.project_rotation_on_control_points(
+      warp_utils.rotate_points(
         control_points, center_point, rotation)
     )
 
