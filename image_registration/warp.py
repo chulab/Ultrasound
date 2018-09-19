@@ -276,6 +276,7 @@ def total_warp_points(warp_list: List[tf.Tensor],
   total_warp_tensor = tf.zeros(control_point_shape)
 
   for warp_tensor in warp_list:
+    warp_tensor = tf.cast(warp_tensor, total_warp_tensor.dtype)
     total_warp_tensor = total_warp_tensor + warp_tensor
 
   return total_warp_tensor
