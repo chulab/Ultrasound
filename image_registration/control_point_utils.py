@@ -45,7 +45,7 @@ def warp_tensor(
       elastic_image.control_points, elastic_image.center_point,
       elastic_image.rotation)]
   if translation:
-    tensors += [prepare_translation(translation)]
+    tensors += [prepare_translation(elastic_image.translation)]
   if non_rigid:
     tensors += [elastic_image.non_rigid]
 
