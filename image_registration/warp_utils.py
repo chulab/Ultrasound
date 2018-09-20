@@ -130,6 +130,7 @@ def rotate_points(
   center_point = tf.cast(center_point, points.dtype)
   centered_points = points - center_point
 
+  rotation = tf.cast(rotation, tf.float32)
   rotation_radians = rotation * tf.constant(_RADIANS_PER_DEGREE)
 
   rotation_matrix = tf.reshape(tf.stack([
