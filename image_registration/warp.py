@@ -19,7 +19,7 @@ tfe = tf.contrib.eager
 def sparse_warp(image: tf.Tensor,
                 control_points: tf.Tensor,
                 warp_values: List[tf.Tensor],
-                scale: int = 1, ):
+                scale: float = 1., ):
   """Warps image using a sparse set of displacements.
 
   Optionally rescales image before performing warp. This resizing is
@@ -41,8 +41,8 @@ def sparse_warp(image: tf.Tensor,
     warp_points = total_warp_points(warp_values, control_points.shape)
     destination_control_points = warp_points + control_points
 
-    if scale != 1.:
-      control_ponts = rescale_points(control_points, scale)
+    if not scale == 1.:
+      control_points = rescale_points(control_points, scale)
       destination_control_points = rescale_points(
         destination_control_points, scale)
 
@@ -60,20 +60,41 @@ def sparse_warp(image: tf.Tensor,
   return warped, dense_mesh
 
 
-def dense_warp(image,
-               warp_values):
+def dense_warp(
+    image: tf.Tensor,
+    warp_values: List[tf.Tensor]
+):
   """Warps image.
 
+  Performs a dense warp on an image. This means no interpolation is applied
+  between warp "control points" and the flows relating the coordinates of the
+  warped image to the original image. In other words, each of the `warp_values`
+  tensors is taken as a complete description of a flow field without
+  interpolation.
+
+  This requires that each of the `warp_values` is compatible with the
+  dimensions of a flow field (`[batch_size, height, width, 2]`).
+
   Args:
-      image: tf.Tensor of shape [B, H, W, C]. Float dtype.
-      warp_values: list of tf.Tensor.  Each Tensor muse have shape [H,W,2]
+      image: `tf.Tensor` of shape `[B, H, W, C]`.
+      warp_values: list of `tf.Tensor`. Each `tf.Tensor` muse have shape
+        compatible with `[batch_size, height, width, 2]`.
+
   Returns:
       warped_images:
   """
+  if not all(tensor.shape.is_compatible_with([None, None, None, 2])
+             for tensor in warp_values):
+    raise ValueError(
+      "All Tensors must be compatible with shape"
+      " `[batch_size, height, width, 2], got "
+      "{}`".format([tensor.shape for tensor in warp_values]))
 
   with tf.variable_scope("dense_warp"):
     image_sz = image.shape
-    control_point_shape = tf.TensorShape([image_sz[0], image_sz[1], image_sz[2], 2])
+
+    control_point_shape = tf.TensorShape(
+      [image_sz[0], image_sz[1], image_sz[2], 2])
     warp_points = total_warp_points(warp_values, control_point_shape)
 
     image = tf.cast(image, tf.float32)
@@ -157,6 +178,7 @@ def warp_query(image: tf.Tensor,
                      control_points,
                      destination_control_points,
                      )
+
 
 def _warp_query(
     image,
@@ -282,11 +304,12 @@ def total_warp_points(warp_list: List[tf.Tensor],
 
   return total_warp_tensor
 
+
 def soft_is_compatible_with(
-  shape_1: tf.TensorShape,
-  shape_2: tf.TensorShape,
+    shape_1: tf.TensorShape,
+    shape_2: tf.TensorShape,
 ):
   return all(dimension_1.is_compatible_with(1) or
-           dimension_2.is_compatible_with(1) or
-           dimension_1.is_compatible_with(dimension_2)
-           for dimension_1, dimension_2 in zip(shape_1, shape_2))
+             dimension_2.is_compatible_with(1) or
+             dimension_1.is_compatible_with(dimension_2)
+             for dimension_1, dimension_2 in zip(shape_1, shape_2))

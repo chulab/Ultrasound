@@ -19,11 +19,7 @@ class TestWarp(tf.test.TestCase):
 
     self.image = tf.constant(self.image_np)
 
-
-
   def testDenseWarp(self):
-    """Tests dense_warp"""
-
     correct_warp = np.array([[5, 5, 5, 5, 5, 5, 5, 5],
                              [5, 5, 5, 5, 5, 5, 5, 5],
                              [5, 5, 5, 5, 5, 5, 5, 5],
@@ -48,6 +44,11 @@ class TestWarp(tf.test.TestCase):
     with tf.Session() as sess:
       warped_image_eval = sess.run(warped_image)
     self.assertAllClose(warped_image_eval, self.image_np)
+
+  def testDenseWarpBadArgs(self):
+    with self.assertRaisesRegex(ValueError, "[3, 2, 1]"):
+      warp_matrix = tf.ones([3, 2, 1])
+      warped_image = warp.dense_warp(self.image, [warp_matrix])
 
   def testWarpQueryNoScaleNoWarp(self):
     control_points = tf.constant([[[0,0], [0, 7], [6, 0], [6,7]]])
