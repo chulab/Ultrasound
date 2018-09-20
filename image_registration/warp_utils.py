@@ -13,6 +13,8 @@ x-y indexing). For example, the positions [1,2] and [4, 3] will correspond to:
 import tensorflow as tf
 from image_registration import elastic_image
 
+_RADIANS_PER_DEGREE = 2 * 3.1415 / 360
+
 
 def warp_tensor(
   elastic_image: elastic_image.ElasticImage,
@@ -104,7 +106,7 @@ def rotate_points(
   Calculates the displacement of each point as they are rotated about
   `center_point` by rotation `rotation` in a counter-clockwise direction.
 
-  Note that this is not the location of the `points` after rotation.
+  NOTE that this is not the location of the `points` after rotation.
   Rather, it is the vector between `points` and their rotated image.
   Explicitly,
 
@@ -128,7 +130,7 @@ def rotate_points(
   center_point = tf.cast(center_point, points.dtype)
   centered_points = points - center_point
 
-  rotation_radians = rotation * 2 * 3.1415 / 360
+  rotation_radians = rotation * tf.constant(_RADIANS_PER_DEGREE)
 
   rotation_matrix = tf.reshape(tf.stack([
     tf.cos(rotation_radians),
@@ -140,7 +142,7 @@ def rotate_points(
 
   rotation_matrix = tf.cast(rotation_matrix, points.dtype)
 
-  centered_rotation_points = tf.einsum(
+  points_rotated_about_center = tf.einsum(
     'ij,nj->ni', rotation_matrix, centered_points)
 
-  return centered_rotation_points - centered_points
+  return points_rotated_about_center - centered_points
