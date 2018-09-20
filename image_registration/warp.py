@@ -17,7 +17,7 @@ tfe = tf.contrib.eager
 
 
 def sparse_warp(image: tf.Tensor,
-                control_points: tf.Tensor,
+                source_control_point_locations: tf.Tensor,
                 warp_values: List[tf.Tensor],
                 scale: float = 1., ):
   """Warps image using a sparse set of displacements.
@@ -28,36 +28,34 @@ def sparse_warp(image: tf.Tensor,
 
   Args:
       image: `tf.Tensor` of shape `[B, H, W, C]`.
-      control_points: `tf.Tensor` of shape `[B, num_control_points, 2]`.
+      source_control_point_locations: `tf.Tensor` of shape `[B, num_control_points, 2]`.
       warp_values: `tf.Tensor` of shape `[B, num_control_points, 2]`.
       scale: int `tf.Tensor`. Factors of 2.
 
   Returns:
-      warped image: image.  Tensor of shape `[N, H, W, C]`.
-      dense warp: dense warp array. Tensor of shape `[N, H, W, 2]`.
+      warped_image: image.  Tensor of shape `[N, H, W, C]`.
+      flow_field: dense warp array. Tensor of shape `[N, H, W, 2]`.
   """
 
   with tf.variable_scope("sparse_warp"):
-    warp_points = total_warp_points(warp_values, control_points.shape)
-    destination_control_points = warp_points + control_points
+    warp_points = total_warp_points(warp_values, source_control_point_locations.shape)
+    dest_control_point_locations = warp_points + source_control_point_locations
 
     if not scale == 1.:
-      control_points = rescale_points(control_points, scale)
-      destination_control_points = rescale_points(
-        destination_control_points, scale)
+      source_control_point_locations = rescale_points(source_control_point_locations, scale)
+      dest_control_point_locations = rescale_points(
+        dest_control_point_locations, scale)
 
-      new_image = rescale_image_using_pooling(image, scale)
+      image = rescale_image_using_pooling(image, scale)
 
-    else:
-      new_image = image
 
-    warped, dense_mesh = sparse_image_warp(new_image,
-                                           control_points,
-                                           destination_control_points,
+    warped_image, flow_field = sparse_image_warp(image,
+                                           source_control_point_locations,
+                                           dest_control_point_locations,
                                            interpolation_order=2,
                                            )
 
-  return warped, dense_mesh
+  return warped_image, flow_field
 
 
 def dense_warp(
