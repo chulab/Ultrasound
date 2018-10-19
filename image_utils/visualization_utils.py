@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 
 
 def multiple_intensity_to_rgb(im_1: np.ndarray,
-                              im_2: np.ndarray=None,
-                              im_3: np.ndarray=None
+                              im_2: np.ndarray = None,
+                              im_3: np.ndarray = None
                               ):
   """Creates an RGB array from 3 intensity maps.
 
@@ -45,10 +45,11 @@ def multiple_intensity_to_rgb(im_1: np.ndarray,
 
 
 def plot_displacement_vectors(
-      control_points: np.ndarray,
-      displacement_vector: np.ndarray,
-      images=None,
-      axes=None, ):
+    control_points: np.ndarray,
+    displacement_vector: np.ndarray,
+    arrow_scale=1.,
+    images=None,
+    axes=None, ):
   """Plots a vector field given control points and displacement vectors.
 
   The displacement vector measures the displacement of a point from the old
@@ -57,6 +58,10 @@ def plot_displacement_vectors(
   Args:
     control_points: Array of shape [N, 2]
     displacement_vector: Array of shape [N, 2]
+    arrow_scale: Scales the length of the displayed arrows relative to the grid size.
+        I.e. `arow_scale=1` means that a displacement vector of .5 will have
+        an arrow of length 2. See documentation for `matplotlib.pyplot.quiver` for
+        more information.
     image: Optional List of image arrays of shape [H, W] to display behind
     vector field.
     axes: Axes on which to plot.
@@ -70,7 +75,6 @@ def plot_displacement_vectors(
                      "the same shape, got {}".format(
       [control_points, displacement_vector]))
 
-
   X = control_points[:, 0]
   Y = control_points[:, 1]
 
@@ -79,10 +83,13 @@ def plot_displacement_vectors(
 
   if axes is not None:
     if images is not None:
-      axes.imshow(multiple_intensity_to_rgb(*images))
-    axes.quiver(Y, X, V, U, angles='xy', pivot='tip', color='r')
+      axes.imshow(visualization_utils.multiple_intensity_to_rgb(*images))
+    axes.quiver(Y, X, V, U, angles='xy', pivot='tip', color='r',
+                scale=arrow_scale, scale_units='x', units='x', width=3)
 
   else:
     if images is not None:
-      plt.imshow(multiple_intensity_to_rgb(*images))
-    plt.quiver(Y, X, V, U, angles='xy', pivot='tip', color='r')
+      plt.imshow(visualization_utils.multiple_intensity_to_rgb(*images))
+    plt.quiver(Y, X, V, U, angles='xy', pivot='tip', color='r',
+               scale=arrow_scale, scale_units='x', units='x', width=3)
+    quiver(Y, X, V, U, angles='xy', pivot='tip', color='r')
