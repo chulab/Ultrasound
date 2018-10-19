@@ -13,7 +13,51 @@ x-y indexing). For example, the positions [1,2] and [4, 3] will correspond to:
 import tensorflow as tf
 from image_registration import elastic_image
 
-_RADIANS_PER_DEGREE = 2 * 3.1415 / 360
+_RADIANS_PER_DEGREE = 2 * 3.1415 / 360.
+
+
+def warp_tensor_dense(
+    elastic_image: elastic_image.ElasticImage,
+    rotation: bool,
+    translation: bool,
+    non_rigid: bool
+):
+  """Prepares Variables from `ElasticImage` for dense warp operations.
+
+  This function should be used when `warp_tenser` are being passed
+  directly to `tf.dense_warp`.
+
+  The difference between this and `warp_tensor` arises from the fact that
+  `tf.sparse_warp` expects a warp field that points from the `control_points`
+  to their image in the warped coordinates.  On the other hand `tf.dense_warp`
+  expects a warp field that ends in the coordinates of the warped image.
+
+  Args:
+    elastic_image: See `warp_tensor`.
+    rotation: bool. See `warp_tensor`.
+    translation: See `warp_tensor`.
+    non_rigid: See `warp_tensor`.
+
+  Returns:
+    warp_field: List of `tf.Tensor` corresponding requested variables.
+  """
+  tensors = []
+  # The main distinction here is that rotation is reversed and the center point
+  # is changed so that it is at the translted position. This is necessary
+  # when using the dense warp paradigm because we want to perform
+  # `translation(rotation(image))` not `rotation(translation(image))`.
+  if rotation:
+    tensors += [- rotate_points(
+      elastic_image.control_points, elastic_image.center_point + elastic_image.translation,
+      - elastic_image.rotation)]
+  if translation:
+    tensors += [prepare_translation(elastic_image.translation)]
+  if non_rigid:
+    tensors += [elastic_image.non_rigid]
+
+  # Update shape of tensors so they have correct dimension for warp functions.
+  # [batch_size, point_count, 2]
+  return [warp_tensor[tf.newaxis, :, :] for warp_tensor in tensors]
 
 
 def warp_tensor(
@@ -113,7 +157,8 @@ def rotate_points(
      = control_point_image[i] - control_point[i]
 
   Args:
-    points: `tf.Tensor` of shape `[num_points, 2]`.
+    points: `tf.Tensor` of shape `[num_points, 2]`. Last axis corresponds to
+      [i, j] (See note at top of module on coordinates).
     center_point: `tf.Tensor` compatible with `points`.
     rotation: Scalar `tf.Tensor`.  Represents rotation in degrees clockwise.
 

@@ -55,7 +55,8 @@ def load_image(
   eimage.rotation = rotation
 
   translation = warp_parameters.make_translation_warp_variable(
-    initial_translation)
+    initial_translation
+  )
   eimage.translation = translation
 
   non_rigid = warp_parameters.make_elastic_warp_variable(
